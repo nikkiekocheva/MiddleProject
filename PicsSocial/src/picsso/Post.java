@@ -1,32 +1,30 @@
 package picsso;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class Post {
 	//who made the post
-	private Account owner;
+	private final Account owner;
 	private Set<Account> likes;
-    private Set<Comment> comments;
+    private ArrayList<Comment> comments;
     private Set<Account> tags;
     private String location;
     private String description;
-    private String conntent; // path to video file or picture
+    private String content; // path to video file or picture
     
     Post(Account owner){
     	this.owner = owner;
     	likes = new HashSet<>();
-    	comments = new TreeSet<>();
+    	comments = new ArrayList<>();
     	tags = new HashSet<>();
     	
     };
     
-    Post owner(Account owner) {
-    	this.owner=owner;
-    	return this;
-    } 
     
     Post tags(Account...accounts) 
     {
@@ -71,8 +69,8 @@ public class Post {
 		return Collections.unmodifiableSet(likes);
 	}
 
-	public Set<Comment> getComments() {
-		return comments;
+	public List<Comment> getComments() {
+		return Collections.unmodifiableList(comments);
 	}
 
 	public Set<Account> getTags() {
@@ -88,8 +86,8 @@ public class Post {
 		return description;
 	}
 
-	public String getConntent() {
-		return conntent;
+	public String getContent() {
+		return content;
 	}
 
     
