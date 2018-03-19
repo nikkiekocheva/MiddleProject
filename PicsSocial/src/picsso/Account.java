@@ -5,7 +5,7 @@ public class Account {
 	private Profile profile;
 	private String email;
 	private String password;
-	public static int identificalNumber = 0;
+	private static int identificalNumber = 0;
 	public final int PERSONAL_ID;
 	
 	public Account(String email, String password) {
