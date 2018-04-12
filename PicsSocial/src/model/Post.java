@@ -1,4 +1,4 @@
-package picsso;
+package model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,15 +9,16 @@ import java.util.TreeSet;
 
 public class Post {
 	//who made the post
-	private final Account owner;
-	private Set<Account> likes;
+	private final User owner;
+	private int id;
+	private Set<User> likes;
     private ArrayList<Comment> comments;
-    private Set<Account> tags;
+    private Set<User> tags;
     private String location;
     private String description;
     private String content; // path to video file or picture
     
-    Post(Account owner){
+    Post(User owner){
     	this.owner = owner;
     	likes = new HashSet<>();
     	comments = new ArrayList<>();
@@ -25,10 +26,13 @@ public class Post {
     	
     };
     
-    
-    Post tags(Account...accounts) 
+    Post id(int id){
+    	this.id=id;
+    	return this;
+    }
+    Post tags(User...accounts) 
     {
-        for(Account a : accounts) {
+        for(User a : accounts) {
         	tags.add(a);
         }
     	return this;
@@ -57,15 +61,15 @@ public class Post {
     	comments.add(comment);
     }
   
-    void like(Account a) {
+    void like(User a) {
     	likes.add(a);
     }
     
-	public Account getOwner() {
+	public User getOwner() {
 		return owner;
 	}
 
-	public Set<Account> getLikes() {
+	public Set<User> getLikes() {
 		return Collections.unmodifiableSet(likes);
 	}
 
@@ -73,7 +77,7 @@ public class Post {
 		return Collections.unmodifiableList(comments);
 	}
 
-	public Set<Account> getTags() {
+	public Set<User> getTags() {
 		return Collections.unmodifiableSet(tags);
 	}
 
@@ -89,7 +93,10 @@ public class Post {
 	public String getContent() {
 		return content;
 	}
-
+  
+	public int getId() {
+		return id;
+	}
     
     
 }

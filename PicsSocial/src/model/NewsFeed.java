@@ -1,4 +1,4 @@
-package picsso;
+package model;
 
 
 import java.util.ArrayList;
