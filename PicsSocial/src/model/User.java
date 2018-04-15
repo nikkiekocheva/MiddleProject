@@ -29,8 +29,6 @@ public class User {
 	private final NewsFeed newsFeed;
 	private List<Post> posts;
 
-	
-	
 	public User(String firstName, String lastName, String email, String phone, String password) {
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -42,23 +40,27 @@ public class User {
 		newsFeed = new NewsFeed();
 		posts = new ArrayList<>();
 	}
-	
+
 	public void setID(int i) {
 		this.id = i;
 		System.out.println("id set to " + this.id);
 	}
-	
-	public int getId() {
-		return id;
-	}
-	
+
 	public void setPassword(String password) {
-		this.password = HashingClass.hashPassword(password);	
+		if (password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$")) {
+			this.password = HashingClass.hashPassword(password);
+		} else {
+			System.out.println("Invalid password");
+			System.out.println(
+					"The password must be at least 8 chars, containing at least one digit,contains at least one lower alpha char and one upper alpha char, and at least one special symbol. Does not contain space, tab, etc. OR matches the previous password.");
+
+		}
 	}
 
-//	public User(String firstName, String lastName, String email, String phone, String password) {
-//		this(firstName, lastName, email, phone, password);
-//	}
+	// public User(String firstName, String lastName, String email, String phone,
+	// String password) {
+	// this(firstName, lastName, email, phone, password);
+	// }
 
 	public void follow(User a) {
 		following.add(a);
@@ -178,8 +180,6 @@ public class User {
 	public String getPassword() {
 		return password;
 	}
-
-	
 
 	public List<Post> getPosts() {
 		return Collections.unmodifiableList(posts);

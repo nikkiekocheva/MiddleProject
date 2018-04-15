@@ -7,6 +7,7 @@ import javax.jws.soap.SOAPBinding.Use;
 
 import controller.DBManager;
 import controller.UserManager;
+import exceptions.InvalidPasswordException;
 import model.User;
 
 
@@ -17,19 +18,19 @@ public class Demo {
 		DBManager dbManager = DBManager.getInstance();
 		Connection connection = DBManager.getInstance().getConnection();
 		try {
-//			UserManager.getInstance().register("TestFn", "TestLN", "testmail@testail.te", "0888888888", "testpassword");
-			User u = UserManager.getInstance().login("testmail@testail.te", "testpassword");
-			System.out.println(" Welcome, "+ u.getFirstName() + " " + u.getLastName());
+//			UserManager.getInstance().register("TestFn", "TestLN", "testmail@testail.te", "0888888888", "testPassword1*");
+			User u = UserManager.getInstance().login("testmail@testail.te", "testPassword1*");
+			//System.out.println(UserManager.getInstance().getId(u));
+			//System.out.println(" Welcome, "+ u.getFirstName() + " " + u.getLastName());
 			UserManager.getInstance().changePassword(u);
+//			UserManager.getInstance().editProfile(u);
+//			
 		} catch (SQLException e) {
 			System.out.println("SQL error: " + e.getMessage());
 		}
-		
-		//TO-DOs:
-		//Password and email validation check
-		//Exceptions
-		//The bug in changePassword()
-		//Test edit profile, followers, posts, etc 
+		catch(InvalidPasswordException e) {
+			System.out.println(e.getMessage());
+		}
 		
 		
 		

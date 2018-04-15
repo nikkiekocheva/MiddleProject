@@ -6,6 +6,7 @@ import java.util.Collections;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import exceptions.InvalidPasswordException;
 import model.User;
 import model.dao.UserDao;
 
@@ -29,14 +30,18 @@ public class UserManager {
 			if (passwordMatch(password, userPassword)) {
 				System.out.println("Login complete");
 				return UserDao.USER_DAO.getByEmail(email);
-				
 			}else {
+				System.out.println("Can't log in!");
 				return null;
 			}
 	}
 	
-	public void changePassword(User u) throws SQLException {
+	public void changePassword(User u) throws SQLException, InvalidPasswordException {
 		UserDao.USER_DAO.changePassword(u);
+	}
+	
+	public void editProfile(User u) throws SQLException, InvalidPasswordException {
+		UserDao.USER_DAO.editProfile(u);;
 	}
 
 	public boolean register(String firstName, String lastName, String email, String phone, String password) {
@@ -60,7 +65,17 @@ public class UserManager {
 	}
 
 	public boolean passwordMatch(String password, String userPassword) {
+		try {
 		return BCrypt.checkpw(password, userPassword);
+		}
+		catch(IllegalArgumentException e) {
+			System.out.println("Wrong password!");
+		}
+		return false;
+	}
+	
+	public int getId(User u) {
+		return UserDao.USER_DAO.getUserID(u);
 	}
 
 }

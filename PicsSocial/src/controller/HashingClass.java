@@ -7,7 +7,6 @@ public class HashingClass extends BCrypt{
 	public static String hashPassword(String password) {
 		String salt = BCrypt.gensalt(5);
 		String hashedPassword = BCrypt.hashpw(password, salt);
-		//BCrypt.checkPw() ---> forgotten psw
 		return(hashedPassword);
 	}
 	

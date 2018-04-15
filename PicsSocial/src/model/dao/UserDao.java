@@ -1,6 +1,5 @@
 package model.dao;
 
-import java.beans.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,6 +10,7 @@ import java.util.Scanner;
 
 import controller.DBManager;
 import controller.UserManager;
+import exceptions.InvalidPasswordException;
 import model.User;
 
 public enum UserDao implements IUserDao {
@@ -23,7 +23,7 @@ public enum UserDao implements IUserDao {
 	}
 
 	@Override
-	public void changeUser(User u) throws SQLException {
+	public void changeUser(User u) throws SQLException, InvalidPasswordException {
 		Scanner sc = new Scanner(System.in);
 
 		System.out.println("----EDIT INFORMATION----");
@@ -113,7 +113,7 @@ public enum UserDao implements IUserDao {
 
 	}
 
-	public void changePassword(User u) throws SQLException {
+	public void changePassword(User u) throws SQLException, InvalidPasswordException {
 		Scanner sc = new Scanner(System.in);
 		String oldPass, newPass, confirmNewPass;
 		System.out.println("----CHANGE PASSWORD----");
@@ -127,21 +127,22 @@ public enum UserDao implements IUserDao {
 
 		System.out.println("Save: Y/N");
 		if (sc.next().charAt(0) == 'Y') {
-			System.out.println("in");
 			if (UserManager.getInstance().passwordMatch(oldPass, u.getPassword())) {
 				System.out.println("Your password was entered incorrectly. Please enter it again!");
 			} else if (!newPass.equals(confirmNewPass)) {
 				System.out.println("The two password fields didn't match.");
-			} else {
-				PreparedStatement s = connection.prepareStatement("UPDATE users SET password = ? WHERE id= ?;");
-				s.setString(1, newPass);
-				s.setInt(2, u.getId()); // getId not working, returns 0 
-				System.out.println(u.getId());
-				s.executeUpdate();
-				u.setPassword(newPass);
-				System.out.println("The password was changed!");
-			}
-
+			} else if ((!newPass.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$"))
+						&& (newPass.equals(oldPass))) {
+					throw new InvalidPasswordException();
+				} else {
+					PreparedStatement s = connection.prepareStatement("UPDATE users SET password = ? WHERE id= ?;");
+					u.setPassword(newPass);
+					s.setString(1, u.getPassword());
+					s.setInt(2, getUserID(u));
+					System.out.println(getUserID(u));
+					s.executeUpdate();
+					System.out.println("The password was changed!");
+				}
 		}
 	}
 
@@ -155,19 +156,34 @@ public enum UserDao implements IUserDao {
 				u.setID(id);
 				System.out.println("id: " + id);
 			}
-			
+
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
 
 	}
 
-	private void editProfile(User u) throws SQLException {
+	public int getUserID(User u) {
+		try {
+			PreparedStatement s = connection.prepareStatement("SELECT id FROM mydb.users WHERE users.email = ?");
+			s.setString(1, u.getEmail());
+			ResultSet result = s.executeQuery();
+			while (result.next()) {
+				int id = result.getInt("id");
+				return id;
+			}
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return 0;
+	}
+
+	public void editProfile(User u) throws SQLException, InvalidPasswordException {
 		Scanner sc = new Scanner(System.in);
 		String[] profileInfo = new String[7];
 
-		System.out.println("----EDIT PROFILE----");
-		System.out.println();
+		System.out.println("----EDIT PROFILE----\n");
 		System.out.println("1. First name");
 		System.out.println("2. Last name");
 		System.out.println("3. Username");
@@ -182,13 +198,15 @@ public enum UserDao implements IUserDao {
 			case 1: {
 				System.out.println("1. ");
 				profileInfo[0] = sc.next();
-			}
 				break;
+			}
+
 			case 2: {
 				System.out.println("2. ");
 				profileInfo[1] = sc.next();
-			}
 				break;
+			}
+
 			case 3: {
 				System.out.println("3. ");
 				profileInfo[2] = sc.next();
@@ -225,10 +243,12 @@ public enum UserDao implements IUserDao {
 						}
 						profileInfoIndex[j++] = i + 1;
 						query.append((i + 1) + "=?");
+					} else {
+						continue;
 					}
 				}
 				PreparedStatement s = connection
-						.prepareStatement("UPDATE Users SET " + query + "WHERE id=" + u.getId() + ";");
+						.prepareStatement("UPDATE Users SET " + query + "WHERE id =" + getUserID(u) + ";");
 				for (int i = 0; i < profileInfoIndex.length; i++) {
 					String text = profileInfo[profileInfoIndex[i]];
 					s.setString(i + 1, text);
