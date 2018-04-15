@@ -4,13 +4,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Scanner;
 
 import controller.DBManager;
 import controller.UserManager;
 import exceptions.InvalidPasswordException;
+import model.Post;
 import model.User;
 
 public enum UserDao implements IUserDao {
@@ -50,7 +55,7 @@ public enum UserDao implements IUserDao {
 	@Override
 	public void saveUser(User u) throws SQLException {
 		PreparedStatement s = connection.prepareStatement(
-				"INSERT INTO mydb.users(first_name, last_name, email, phone, password) VALUES (?,?,?,?,?)");
+				"INSERT INTO users(first_name, last_name, email, phone, password) VALUES (?,?,?,?,?)");
 		s.setString(1, u.getFirstName());
 		s.setString(2, u.getLastName());
 		s.setString(3, u.getEmail());
@@ -85,7 +90,7 @@ public enum UserDao implements IUserDao {
 
 	public User getByEmail(String email) throws SQLException {
 		PreparedStatement s = connection.prepareStatement(
-				"SELECT first_name, last_name, email, phone, password FROM mydb.users WHERE email = ?");
+				"SELECT first_name, last_name, email, phone, password FROM users WHERE email = ?");
 		s.setString(1, email);
 		ResultSet result = s.executeQuery();
 		User u = null;
@@ -132,23 +137,23 @@ public enum UserDao implements IUserDao {
 			} else if (!newPass.equals(confirmNewPass)) {
 				System.out.println("The two password fields didn't match.");
 			} else if ((!newPass.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$"))
-						&& (newPass.equals(oldPass))) {
-					throw new InvalidPasswordException();
-				} else {
-					PreparedStatement s = connection.prepareStatement("UPDATE users SET password = ? WHERE id= ?;");
-					u.setPassword(newPass);
-					s.setString(1, u.getPassword());
-					s.setInt(2, getUserID(u));
-					System.out.println(getUserID(u));
-					s.executeUpdate();
-					System.out.println("The password was changed!");
-				}
+					&& (newPass.equals(oldPass))) {
+				throw new InvalidPasswordException();
+			} else {
+				PreparedStatement s = connection.prepareStatement("UPDATE users SET password = ? WHERE id= ?;");
+				u.setPassword(newPass);
+				s.setString(1, u.getPassword());
+				s.setInt(2, getUserID(u));
+				System.out.println(getUserID(u));
+				s.executeUpdate();
+				System.out.println("The password was changed!");
+			}
 		}
 	}
 
 	public void setID(User u) {
 		try {
-			PreparedStatement s = connection.prepareStatement("SELECT id FROM mydb.users WHERE users.email = ?");
+			PreparedStatement s = connection.prepareStatement("SELECT id FROM users WHERE users.email = ?");
 			s.setString(1, u.getEmail());
 			ResultSet result = s.executeQuery();
 			while (result.next()) {
@@ -165,7 +170,7 @@ public enum UserDao implements IUserDao {
 
 	public int getUserID(User u) {
 		try {
-			PreparedStatement s = connection.prepareStatement("SELECT id FROM mydb.users WHERE users.email = ?");
+			PreparedStatement s = connection.prepareStatement("SELECT id FROM users WHERE users.email = ?");
 			s.setString(1, u.getEmail());
 			ResultSet result = s.executeQuery();
 			while (result.next()) {
@@ -290,4 +295,28 @@ public enum UserDao implements IUserDao {
 		} // end of while
 	}
 
+	public void post(User u, String description, String path) {
+		Post p = new Post(u);
+		p.setDescription(description);
+		p.setContent(path);
+		u.addPost(p);
+		try {
+			PreparedStatement ps = connection
+					.prepareStatement("INSERT into posts(content, description, user_id, date) VALUES(?, ?, ?, ?)");
+			
+			Date date = new Date();
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String currentDateTime = format.format(date);
+			//Date date = dateFormat.parse("yyyy-MM-dd HH:mm:ss");
+			//Date date = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").parse(LocalDateTime.now().toString());
+			//java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+			ps.setString(1, path);
+			ps.setString(2, description);
+			ps.setInt(3, getUserID(u));
+			ps.setString(4, currentDateTime);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+	}
 }

@@ -74,6 +74,10 @@ public class UserManager {
 		return false;
 	}
 	
+	
+	public void addPost(User u, String description, String path) {
+		UserDao.USER_DAO.post(u, description, path);
+	}
 	public int getId(User u) {
 		return UserDao.USER_DAO.getUserID(u);
 	}

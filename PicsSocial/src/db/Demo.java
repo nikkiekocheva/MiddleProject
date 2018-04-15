@@ -18,22 +18,15 @@ public class Demo {
 		DBManager dbManager = DBManager.getInstance();
 		Connection connection = DBManager.getInstance().getConnection();
 		try {
-//			UserManager.getInstance().register("TestFn", "TestLN", "testmail@testail.te", "0888888888", "testPassword1*");
+			//UserManager.getInstance().register("TestFn", "TestLN", "testmail@testail.te", "0888888888", "testPassword1*");
 			User u = UserManager.getInstance().login("testmail@testail.te", "testPassword1*");
 			//System.out.println(UserManager.getInstance().getId(u));
 			//System.out.println(" Welcome, "+ u.getFirstName() + " " + u.getLastName());
-			UserManager.getInstance().changePassword(u);
+//			UserManager.getInstance().changePassword(u);
 //			UserManager.getInstance().editProfile(u);
-//			
+			UserManager.getInstance().addPost(u, "Second post!", "C:\\Users\\Unicornie\\Documents\\gitRepos\\MiddleProject");
 		} catch (SQLException e) {
 			System.out.println("SQL error: " + e.getMessage());
 		}
-		catch(InvalidPasswordException e) {
-			System.out.println(e.getMessage());
-		}
-		
-		
-		
-		
 	}
 }

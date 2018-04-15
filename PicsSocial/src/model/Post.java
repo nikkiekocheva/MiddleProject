@@ -18,7 +18,7 @@ public class Post {
     private String description;
     private String content; // path to video file or picture
     
-    Post(User owner){
+    public Post(User owner){
     	this.owner = owner;
     	likes = new HashSet<>();
     	comments = new ArrayList<>();
@@ -26,11 +26,11 @@ public class Post {
     	
     };
     
-    Post id(int id){
+   public Post id(int id){
     	this.id=id;
     	return this;
     }
-    Post tags(User...accounts) 
+   public Post setTags(User...accounts) 
     {
         for(User a : accounts) {
         	tags.add(a);
@@ -38,30 +38,29 @@ public class Post {
     	return this;
     }
     
-    Post location (String location) {
+   public Post setLocation (String location) {
     	if(location!= null) {
     		this.location= location;
     	}
     	return this;
     }
     
-    Post description (String description) {
+   public  Post setDescription (String description) {
     	if(description!= null) {
     		this.description= description;
     	}
     	return this;
     }
     
-    Post content(String content) {
-    	//TODO
-    	return this;
+   public String setContent(String content) {
+    	return content;
     }
     
-    void comment(Comment comment) {
+   public void comment(Comment comment) {
     	comments.add(comment);
     }
   
-    void like(User a) {
+   public void like(User a) {
     	likes.add(a);
     }
     
